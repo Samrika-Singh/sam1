@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load cmt_tag %}
+
+{% block banner%}
+{% endblock banner%}
+
+{% block midcontent %}
+
+<div class= 'container'>
+    {% if query %}
+        {% if not hasResults %}
+            <div class = 'alert alert-warning'>
+                 No results found for {% for key, value in query %} {{key}} : {{value}} {% endfor %}
+            </div>
+        {% else %}
+            <div class = 'alert alert-secondary'>
+                Results For {% for key, value in query %} {{key}} : {{value}} {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {%  if page.object_list  %}
+        <ul class = "article-list" style="padding:0">
+            {% for article in page.object_list %}
+                <li class = "card w-75 text-align-center" style="text-align:center;margin:0px auto 40px auto">
+                    <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'user:visitprofile' article.user.username %}">
+                                <img class="rounded-circle profile" width="45" src="{% if article.user_avatar_url %}{{ article.user_avatar_url }}{% else %}https://robohash.org/{{article.user.username}}?size=50x50{% endif %}" alt="">
+                                </a>
+                                <div class="ml-2">
+                                    <div class="h5 m-0">{{article.user.username}}</div>
+                                </div>
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-muted h7 mb-2">
+                            <span> <i class="fa fa-clock-o" style="margin-right:5px;"></i> {{ article.published_at|to_date|naturaltime }} </span>
+                        </div>
+                        <h2 class="card-title">{{article.title}}</h2>
+                        <span>{{article.vote_count}} Upvotes<span style="margin: 0px 10px">|</span>{{article.all_comments}} Comments</span>
+                        </div>
+                    </div>
+                    <a class = 'btn btn-primary' href = "{{ article.absolute_url }}">Open</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+
+        <ul class="pagination justify-content-center">
+            {% if page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="{% url 'articles:list' %}?{% if query %}{% for key, value in query %}{{key}}={{value}}&{% endfor %}{% endif %}page={{page.previous_page_number}}" tabindex="-1">Previous</a>
+                </li>
+            {% endif %}
+            {% for pn in page_range %}
+                <li class="page-item {% ifequal page.page_number pn %}active{% endifequal %}">
+                    <a class="page-link" href="{% url 'articles:list' %}?{% if query %}{% for key, value in query %}{{key}}={{value}}&{% endfor %}{% endif %}page={{pn}}">{{pn}}
+                        {% if page.page_number == pn %}
+                            <span class="sr-only">(current)</span>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+            {% if page.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{% url 'articles:list' %}?{% if query %}{% for key, value in query %}{{key}}={{value}}&{% endfor %}{% endif %}page={{page.next_page_number}}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+
+
+    {% elif not query %}
+        <div class = 'alert alert-warning'> No articles! Go to Create article to add some </div>
+    {% endif %}
+</div>
+{% endblock midcontent %}
+
+
+
+
+
+
